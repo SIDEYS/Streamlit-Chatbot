@@ -156,14 +156,25 @@ if user_input:
     top_score = float(scores[top_idx])
     matched_q, matched_a = qa_pairs[top_idx]
 
-    SIMILARITY_THRESHOLD = 0.65
+    SIMILARITY_THRESHOLD_GOOD = 0.60
+    SIMILARITY_THRESHOLD_LOW = 0.20
 
-    if top_score >= SIMILARITY_THRESHOLD:
+    if top_score >= SIMILARITY_THRESHOLD_GOOD:
         llm_answer = rephrase_with_llm(user_input, matched_a)
         st.markdown("🤖 **Bot Response**", unsafe_allow_html=True)
         st.markdown(f"<div class='chatbox bot-response'>{llm_answer}</div>", unsafe_allow_html=True)
-    else:
-        st.warning("😕 I couldn’t find a close match. Try rephrasing your question.")
-        st.markdown("🌟 **Here's what I can help with:**")
+
+    elif SIMILARITY_THRESHOLD_LOW <= top_score < SIMILARITY_THRESHOLD_GOOD:
+        st.warning("🤔 I couldn't find an exact match. Here are a few suggestions that might help:")
         for i, (q, _) in enumerate(qa_pairs[:5]):
             st.markdown(f"🔹 {q}")
+
+        st.markdown("---")
+        st.info("📞 If you're not fully satisfied with the suggestions, feel free to reach out to our support team at:\n\n"
+                "**Email:** support@mankir.com  \n"
+                "**Phone:** +91-98765-43210")
+
+    else:
+        st.error("🚫 I'm unable to interpret your query accurately at the moment.")
+        st.markdown("Please contact our support team for immediate assistance:")
+        st.markdown("📧 **support@mankir.com**  \n📞 **+91-98765-43210**")
